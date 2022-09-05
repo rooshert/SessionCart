@@ -80,7 +80,7 @@ class Cart:
             номенклатуры обратно в десятичное число и добавляя атрибут total_price к каждому элементу. 
             Теперь можно легко выполнить итерацию по товарам в корзине.
         '''
-        # ipdb.set_trace()
+        ipdb.set_trace()
         prod_ids = self.cart.keys()
         # получение объектов product и добавление их в корзину
         prods = Product.objects.filter(id__in=prod_ids)
