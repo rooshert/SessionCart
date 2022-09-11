@@ -2,12 +2,12 @@ from django.shortcuts import render
 
 from .models import OrderItem
 from .forms import OrderCreateForm
+from .tasks import order_created_task
 
 from cart.cart import Cart
 import ipdb
 
 def order_create_view(request):
-    ipdb.set_trace()
     cart = Cart(request)
     if request.method == 'POST':
         form = OrderCreateForm(request.POST or None)
@@ -19,7 +19,15 @@ def order_create_view(request):
                                          product=item['product'],
                                          price=item['price'],
                                          quantity=item['quantity'])
+            # очистка корзины
             cart.clear()
+            '''
+                запуск асинхронной задачи в Celery tasks
+                Мы называем метод delay() задачи, чтобы выполнить ее асинхронно. 
+                Задача будет добавлена в очередь celery и будет выполнена как можно скорее.
+            '''
+            ipdb.set_trace()
+            order_created_task.delay(order.id)
             return render(request, 
                     'orders/order/created.html', 
                     {'order': order})
