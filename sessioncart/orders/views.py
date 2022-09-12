@@ -14,7 +14,6 @@ def order_create_view(request):
         if form.is_valid():
             order = form.save()
             for item in cart:
-                ipdb.set_trace()
                 OrderItem.objects.create(order=order,
                                          product=item['product'],
                                          price=item['price'],
@@ -26,7 +25,6 @@ def order_create_view(request):
                 Мы называем метод delay() задачи, чтобы выполнить ее асинхронно. 
                 Задача будет добавлена в очередь celery и будет выполнена как можно скорее.
             '''
-            ipdb.set_trace()
             order_created_task.delay(order.id)
             return render(request, 
                     'orders/order/created.html', 

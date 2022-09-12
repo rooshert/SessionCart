@@ -8,10 +8,10 @@
     подключения или требуют политики повторных попыток.
 '''
 from celery import shared_task
-from sessioncart.celery import app
-
 from django.core.mail import send_mail
 from .models import Order
+
+import ipdb
 
 @shared_task
 def order_created_task(order_id):
@@ -22,6 +22,12 @@ def order_created_task(order_id):
     subject = 'Order nr. {}'.format(order_id)
     message = 'Dear {},\n\nYou have successfully placed an order.\
                 Your order id is {}.'.format(order.first_name, order.id)
-    ms = send_mail(subject, message, 'admin@myshop.com', [order.email], fail_silently=False)
+    print(order.email)
+    ms = send_mail(
+        subject, 
+        message, 
+        'admin@myshop.com', 
+        [order.email], 
+        fail_silently=False)
     return ms
 
