@@ -7,12 +7,24 @@ from .tasks import order_created_task
 from cart.cart import Cart
 import ipdb
 
+
+def coupon_processing(order, coupon):
+    ipdb.set_trace()
+    if coupon:
+        order.coupon = coupon
+        order.discount = coupon.discount
+        coupon.validate_coupon()
+        coupon.validate_coupon_used_count()
+
 def order_create_view(request):
+    ipdb.set_trace()
     cart = Cart(request)
     if request.method == 'POST':
         form = OrderCreateForm(request.POST or None)
         if form.is_valid():
-            order = form.save()
+            order = form.save(commit=False)
+            coupon_processing(order, cart.coupon)  # Обрабатываем купон заказа 
+            order.save()
             for item in cart:
                 OrderItem.objects.create(order=order,
                                          product=item['product'],
@@ -33,5 +45,4 @@ def order_create_view(request):
         form = OrderCreateForm()
         data = {'cart': cart, 'form': form}
         return render(request, 'orders/order/create.html', data)
-
 

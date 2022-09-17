@@ -1,6 +1,8 @@
 from decimal import Decimal
 from django.conf import settings
+
 from shop.models import Product
+from coupons.models import Coupon
 
 import ipdb
 
@@ -20,6 +22,7 @@ class Cart:
             '''
             cart = self.session[self.session_id] = {}
         self.cart = cart
+        self.coupon_id = self.session.get('coupon_id')  # сохранение текущего примененного купона
 
     def _add_new_product_to_cart(self, prod_id, price):
         self.cart[prod_id] = {'quantity': 0, 'price': str(price)}
@@ -59,6 +62,20 @@ class Cart:
                 Decimal(item['price']) * item['quantity'] 
                 for item in self.cart.values())
 
+    @property
+    def coupon(self):
+        if self.coupon_id:
+            return Coupon.objects.get(id=self.coupon_id)
+        return None
+
+    def get_discount(self):
+        if self.coupon:
+            return (self.coupon.discount / Decimal('100')) * self.get_total_price()
+        return Decimal('0')
+
+    def get_total_price_after_discount(self):
+        return self.get_total_price() - self.get_discount()
+    
     def save(self):
         '''
             Метод обновления сессии cart
@@ -80,7 +97,6 @@ class Cart:
             номенклатуры обратно в десятичное число и добавляя атрибут total_price к каждому элементу. 
             Теперь можно легко выполнить итерацию по товарам в корзине.
         '''
-        ipdb.set_trace()
         prod_ids = self.cart.keys()
         # получение объектов product и добавление их в корзину
         prods = Product.objects.filter(id__in=prod_ids)
@@ -97,7 +113,4 @@ class Cart:
             Подсчет всех товаров в корзине.
         '''
         return sum(item['quantity'] for item in self.cart.values())
-
-
-
 

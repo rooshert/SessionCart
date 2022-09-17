@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from shop.models import Product
+from coupons.forms import CouponApplyForm
 
 from .cart import Cart
-
 from .forms import AddProduct2CartForm
 
 import ipdb
@@ -50,5 +50,14 @@ def cart_detail(request):
         Представление cart_detail выводит на экран текущее состояние корзины.
     '''
     cart = Cart(request)
-    return render(request, 'cart/detail.html', {'cart': cart})
+    for item in cart:
+        item['update_quantity_form'] = AddProduct2CartForm(
+            initial={'quantity': item['quantity'], 'update': True})
+
+    coupon_apply_form = CouponApplyForm()
+    data = {
+            'cart': cart, 
+            'coupon_apply_form': coupon_apply_form
+        }
+    return render(request, 'cart/detail.html', data)
 
