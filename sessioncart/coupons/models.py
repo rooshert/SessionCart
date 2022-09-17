@@ -14,7 +14,6 @@ class Coupon(models.Model):
     active = models.BooleanField()
 
     def validate_coupon_used_count(self):
-        ipdb.set_trace()
         if self.validate_coupon() == True:
             self.can_be_used_count -= 1
 

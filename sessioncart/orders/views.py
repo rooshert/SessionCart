@@ -9,7 +9,6 @@ import ipdb
 
 
 def coupon_processing(order, coupon):
-    ipdb.set_trace()
     if coupon:
         order.coupon = coupon
         order.discount = coupon.discount
@@ -17,7 +16,6 @@ def coupon_processing(order, coupon):
         coupon.validate_coupon_used_count()
 
 def order_create_view(request):
-    ipdb.set_trace()
     cart = Cart(request)
     if request.method == 'POST':
         form = OrderCreateForm(request.POST or None)
